@@ -1,0 +1,104 @@
+## Installation
+
+```
+pip install oianalytics
+```
+
+**Requirements:** Python 3.9+, pandas 2.x, pydantic 2.x
+
+## Basic structure of the oianalytics package
+
+The OIAnalytics SDK is mainly built around two modules: `api`, and `models`.  
+The `api` module is made for interacting with the OIAnalytics public API.  
+The `models` module is made for building and testing "custom models", which is custom Python script designed to be deployed on OIAnalytics.
+
+### API
+
+The `api` module is mainly built with the following structure:
+
+```
+.
+├── api                      # api module
+│   ├── endpoints            # Basic implementations of endpoints of the OIAnalytics public API
+│   ├── utils                # Some utilitaries
+│   ├── _dataframes          # This submodule contains pandas wrappers around enpoints. Its content is usually called through aliases (e.g. api.get_data_list() instead of api._dataframes.data.get_data_list())
+│   ├── _crendentials        # A few objects and functions required to authenticate to OIAnalytics. Usually called via aliases
+```
+
+Most basic usage consists in using functions from the `_dataframes` submodules via their aliases (e.g. `api.get_data_list()`).  
+These functions call the OIAnalytics endpoints and parse the results into pandas structures (usually dataframes), which make them convenient for data exploration and data processing.  
+
+### Models
+
+The `models` module is mainly built with the following structure:
+
+```
+.
+├── models                   # models module
+│   ├── templates            # Templates for building custom code intended to be deployed on OIAnalytics
+│   ├── utils                # Some utilitaries
+│   ├── testing              # Tools for testing custom code intended to be deployed on OIAnalytics
+│   ├── outputs              # All the output objects that must be the outputs of custom code deployed on OIAnalytics, in order to make the application capable of gathering properly the results
+```
+
+This module is only used when developing a custom model, which is custom code intended to be deployed on OIAnalytics.
+
+## Basic usage
+
+There are currently two main use cases for the `oianalytics` Python package:
+
+* __Interacting with the OIAnalytics public API__:
+This is done using the `api` module, for data manipulation, or individual operations on OIAnalytics
+* __Building custom models for OIAnalytics__:
+This is done using the `models` module, and usually by interacting with the OIAnalytics public API for data retrieval, for deploying scripts onto OIAnalytics
+
+The basic import for the package is the following:
+```python {{title="Basic package import"}}
+from oianalytics import api, models
+```
+
+### Interacting with the OIAnalytics public API
+
+#### Credentials
+
+When interacting externally with the OIAnalytics public API, the first step is to setup access credentials.  
+After having created an API access key inside OIAnalytics (see OIAnalytics documentation), these can be used in a Python code using:
+```python {{title="Public API credentials setup"}}
+from oianalytics import api
+
+cred = api.OIAnalyticsAPICredentials(  # (1)!
+    base_url="https://{{platform_name}}.oianalytics.com",
+    login="{{user_login}}",
+    pwd="{{user_password}}"
+)
+
+cred.set_as_default_credentials()  # (2)!
+```
+
+1. The content of the credentials must be adjusted in regard to your platform's url, and the access key attached to the user, created in OIAnalytics
+2. This method allows all further api calls to use these credentials without the need of specifying them (usually through the argument `api_credentials=`)
+
+#### Raw endpoint call
+
+For a low level interaction, raw endpoints are implemented in the `api.endpoints` module.  
+These functions return the raw JSON as retrieved from the public API.
+
+```python {{title="Raw endpoint call"}}
+from oianalytics import api
+
+data_list_json = api.endpoints.data.get_data_list()
+```
+
+The endpoints are spread among several submodules: `assets`, `azure_blob_sources`, `batches`, `computation_jobs`, `dashboard`, `data`, `events`, `files`, `model_instances`, `profiles`, `quantities`, `tags`, `units`, `users`
+
+#### Pandas wrappers
+
+In most cases, it is more convenient for data processing to use the wrappers implemented in `api._dataframes`.  
+These functions usually call the raw endpoint then parse the results into pandas structures (series or dataframes), with parsing alternatives (e.g. retrieve the id or the description of an object).  
+These functions are embedded in submodules as well, but are made accessible at a higher level (hence the fact that it is a private module).  
+For instance, instead of calling `api._dataframes.data.get_data_list()` it is recommended to use the following:
+
+```python {{title="Pandas wrappers"}}
+from oianalytics import api
+
+data_list_df = api.get_data_list()

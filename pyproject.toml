@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "oianalytics"
+version = "0.7.1"
+description = "Python tools for working with OIAnalytics"
+authors = ["Optimistik SAS <arthur.martel@optimistik.fr>"]
+license = "EUPL-1.2"
+readme = "README.md"
+homepage = "https://www.optimistik.fr"
+repository = "https://github.com/optimistik/oianalytics-python-sdk"
+keywords = ["oianalytics", "industrial", "data", "sdk", "spc", "control"]
+classifiers = [
+    "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = ">=2.26.0"
+pandas = ">=2.0.3"
+pydantic = ">=2.10.2"
+
+[tool.poetry.dev-dependencies]
+pytest = ">=5.2"
+pytest-mock = ">=3.0"
+mypy = ">=0.910"
+black = ">=21.11b1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
